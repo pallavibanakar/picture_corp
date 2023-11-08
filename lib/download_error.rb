@@ -1,0 +1,2 @@
+class DownloadError < StandardError
+end
