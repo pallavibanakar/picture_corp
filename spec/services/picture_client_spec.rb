@@ -1,5 +1,5 @@
 require_relative '../../services/picture_client'
-Dir["../lib/*.rb"].each {|file| require file }
+Dir[File.join("./lib", "**", "*.rb")].each {|file| require file }
 require 'pry'
 
 RSpec.describe 'PictureClient' do
@@ -11,7 +11,7 @@ RSpec.describe 'PictureClient' do
 
       it 'returns the file' do
         expect(download_image).to_not be_nil
-        expect(download_image).to be_an_instance_of(String)
+        expect(download_image).to be_an_instance_of(File)
       end
     end
 

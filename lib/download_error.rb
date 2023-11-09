@@ -1,2 +1,0 @@
-class DownloadError < StandardError
-end

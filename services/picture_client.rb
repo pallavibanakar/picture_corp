@@ -1,18 +1,22 @@
 # frozen_string_literal: true
-Dir[File.dirname(__FILE__) + '/../lib/*.rb'].each {|file| require file }
+
+Dir[File.join("./lib", "**", "*.rb")].each {|file| require file }
 require 'open-uri'
 require 'pry'
 
 module Services
   class PictureClient
     include Validators
-    def initialize; end
+    def initialize(dest_path='/tmp')
+      validate_path(dest_path)
+      @dest_path = dest_path
+    end
 
     def download_image(url)
       validate_url(url)
-      file_name, file_extension = extract_file_details(url)
+      file_name = extract_file_name(url)
       image_stream = read_image(url)
-      write_to_tempfile(file_name, file_extension, image_stream)
+      write_to_tempfile(file_name, image_stream)
     end
 
     private
@@ -23,25 +27,28 @@ module Services
           image_file.read
         }
       rescue OpenURI::HTTPError => error
-        raise FetchImageError, "Failed to fetch image for #{url} with error: #{error.message}"
+        raise FetchImageError.new("Failed to fetch image for #{url} with error: #{error.message}")
       end
     end
 
-    def write_to_tempfile(file_name, file_extension, image_stream)
-      image_file = Tempfile.open([file_name, file_extension], binmode: true)
+    def write_to_tempfile(file_name, image_stream)
+      image_file = File.open("#{@dest_path}/#{file_name}", 'wb')
       image_file.write(image_stream) if image_stream
-      image_file.path
+      image_file
     rescue Errno::ENOENT => error
-      raise FileWriteError, error.message
+      raise FileWriteError.new(error.message)
     end
 
     def validate_url(url)
-      raise InvalidUrlError, "Invalid Url #{url}" unless valid_url?(url)
+      raise InvalidUrlError.new("Invalid Url #{url}") unless valid_url?(url)
     end
 
-    def extract_file_details(url)
-      url_path = URI.parse(url).path
-      [url_path.split('/')[-1].split('.')[0], File.extname(url_path)]
+    def validate_path(path)
+      raise InvalidPathError.new("Invalid Path #{path}") unless valid_path?(path)
+    end
+
+    def extract_file_name(url)
+      URI.parse(url).path.split('/')[-1]
     end
   end
 end
