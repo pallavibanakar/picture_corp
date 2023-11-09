@@ -1,13 +1,14 @@
+# frozen_string_literal: true
+
 require_relative '../../services/picture_client'
-Dir[File.join("./lib", "**", "*.rb")].each {|file| require file }
-require 'pry'
+Dir[File.join('./lib', '**', '*.rb')].each { |file| require file }
 
 RSpec.describe 'PictureClient' do
   describe '#download image' do
     subject(:download_image) { Services::PictureClient.new.download_image(url) }
 
     context 'with valid url' do
-      let(:url) {'https://images.freeimages.com/images/large-previews/56d/peacock-1169961.jpg'}
+      let(:url) { 'https://images.freeimages.com/images/large-previews/56d/peacock-1169961.jpg' }
 
       it 'returns the file' do
         expect(download_image).to_not be_nil
@@ -16,10 +17,10 @@ RSpec.describe 'PictureClient' do
     end
 
     context 'with invalid url' do
-      let(:url) {'https://www.freeimages.com/photo/peacock'}
+      let(:url) { 'https://www.freeimages.com/photo/peacock' }
 
       it 'raises invalid url error' do
-        expect{download_image}.to raise_error(InvalidUrlError)
+        expect { download_image }.to raise_error(InvalidUrlError)
       end
     end
   end
@@ -28,7 +29,7 @@ RSpec.describe 'PictureClient' do
     subject(:image_stream) { Services::PictureClient.new.send(:read_image, url) }
 
     context 'with valid url' do
-      let(:url) {'https://images.freeimages.com/images/large-previews/56d/peacock-1169961.jpg'}
+      let(:url) { 'https://images.freeimages.com/images/large-previews/56d/peacock-1169961.jpg' }
 
       it 'returns the image stream' do
         expect(image_stream).to_not be_nil
@@ -37,10 +38,10 @@ RSpec.describe 'PictureClient' do
     end
 
     context 'with invalid url' do
-      let(:url) {'https://www.freeimages.com/photo/peacock.jpg'}
+      let(:url) { 'https://www.freeimages.com/photo/peacock.jpg' }
 
       it 'raises fetch error' do
-        expect{subject}.to raise_error(FetchImageError)
+        expect { subject }.to raise_error(FetchImageError)
       end
     end
   end
